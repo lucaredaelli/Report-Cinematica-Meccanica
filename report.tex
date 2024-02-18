@@ -1,0 +1,459 @@
+\documentclass{article}
+\usepackage[italian]{babel}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{amssymb, amsmath, amsthm, cleveref, graphicx, setspace, hyperref}
+\usepackage[most]{tcolorbox}
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+
+\AddToHook{cmd/section/before}{\clearpage}
+
+\title{Meccanica (per Ing. Informatica) [088804]}
+\author{Analisi cinematica MATLAB - Problema 1 - TdE 14/02/2024}
+\date{Anno accademico 2022-2023 - Politecnico di Milano - Redaelli Luca}
+
+\begin{document}
+\setstretch{1.25}
+\maketitle
+
+\section{Introduzione al problema}
+
+L'analisi cinematica è effettuata in relazione al problema 1 del tema d'esame del 14 febbraio 2024. 
+Il testo, privato della relativa parte di dinamica, è di seguito riportato.
+
+\bigskip
+
+In figura è presente un manovellismo. La cerniera in O è vincolata a terra, mentre quella in B nel centro di un disco di raggio R che rotola senza strisciare e senza resistenza su un piano orizzontale.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Immagine 1.PNG}
+    \caption{Manovellismo ordinario centrato}
+    \label{fig:1}
+\end{figure}
+
+Sono noti, dal testo del problema, i seguenti dati:
+
+\begin{itemize}
+    \item $\overline{OA}$ = 1 $[m]$ = a
+    \item $\overline{AB}$ = $\sqrt{2}$ $[m]$ = b
+    \item $\angle{BOA}$ = 45 [°] = $\alpha$
+    \item $\angle{OBA}$ = 30 [°] = 2$\pi$ - $\beta$
+    \item $\dot{\alpha}$ = 0.5 $[rad/s]$
+    \item $\ddot{\alpha}$ = 1 $[rad/s^2]$
+\end{itemize}
+
+\section{Analisi cinematica del manovellismo}
+\subsection{Chiusura cinematica}
+Il meccanismo per la trasformazione del moto rotatorio continuo della manovella OA nel moto traslatorio alternativo del piede di biella B è un manovellismo ordinario centrato. L’analisi cinematica del meccanismo si basa sulla seguente equazione di chiusura:
+
+\begin{equation}
+    (A - O) + (B - A) = (B - O)
+\end{equation}
+
+che, riscritta sfruttando l'equazione di Eulero, risulta: 
+
+\begin{equation}
+    ae^{i\alpha} + be^{i\beta} = ce^{i\gamma}
+\end{equation}
+
+Si mostra graficamente l'equazione di chiusura.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Immagine 2.PNG}
+    \caption{Chiusura cinematica del manovellismo}
+    \label{fig:2}
+\end{figure}
+
+\subsection{Analisi delle posizioni}
+Dalla soluzione del sistema algebrico non lineare che deriva dalla proiezione sugli assi Reale ed Immaginario dell'equazione (2) si ottiene:
+
+\begin{equation}
+    \begin{cases}
+        acos(\alpha) + bcos(\beta) = ccos(\gamma) \\
+        asin(\alpha) + bsin(\beta) = csin(\gamma)
+    \end{cases}
+\end{equation}
+
+Conoscendo i dati assegnati dal problema risulta semplice ricavare i valori di $\beta$ e $c$ in funzione dell'angolo $\alpha$ assegnato. 
+In modo particolare: 
+
+\begin{equation}
+    \begin{cases}
+        c(\alpha) = acos(\alpha) + bcos(\beta) \\
+        \beta(\alpha) = sin^{-1}(\frac{-asin(\alpha)}{b})
+    \end{cases}
+\end{equation}
+
+Tramite script MATLAB è possibile rappresentare in un grafico le posizioni del piede di biella c e la posizione angolare della biella $\beta$ in funzione della rotazione della manovella $\alpha$.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Posizione Redaelli.png}
+    \caption{Grafici delle posizioni}
+    \label{fig:3}
+\end{figure}
+
+\subsection{Analisi delle velocità}
+Derivando rispetto al tempo l'equazione (3) si ottiene:
+
+\begin{equation}
+    \begin{cases}
+        -\dot{\alpha}asin(\alpha) - \dot{\beta}bsin(\beta) = \dot{c}cos(\gamma) \\
+        \dot{\alpha}acos(\alpha) + \dot{\beta}bcos(\beta) = \dot{c}sin(\gamma)
+    \end{cases}
+\end{equation}
+
+dalla quale è comodo ricavare e risolvere il sistema matriciale sfruttando i dati forniti dal problema e quelli ottenuti al punto precedente.
+
+\begin{equation}
+    \begin{bmatrix}
+        cos(\gamma) & bsin(\beta) \\
+        sin(\gamma) & -bcos(\beta)
+    \end{bmatrix}
+    \begin{bmatrix}
+        \dot{c} \\
+        \dot{\beta}
+    \end{bmatrix}
+    = \begin{bmatrix}
+        -\dot{\alpha}asin(\alpha) \\
+        \dot{\alpha}acos(\alpha)
+    \end{bmatrix}
+\end{equation}
+
+Ancora una volta, tramite script MATLAB, è possibile rappresentare in un grafico le velocità del piede di biella $\dot{c}$ e la velocità angolare della biella $\dot{\beta}$ in funzione della rotazione della manovella $\alpha$.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Velocità Redaelli.png}
+    \caption{Grafici delle velocità}
+    \label{fig:4}
+\end{figure}
+
+\subsection{Analisi delle accelerazioni}
+Derivando rispetto al tempo l'equazione (5) si ottiene:
+
+\begin{equation}
+    \begin{cases}
+        -\ddot{\alpha}asin(\alpha) - \dot{\alpha}^2acos(\alpha) - \ddot{\beta}bsin(\beta) - \dot{\beta}^2bcos(\beta) = \ddot{c}cos(\gamma) \\
+        \ddot{\alpha}acos(\alpha) - \dot{\alpha}^2asin(\alpha) + \ddot{\beta}bcos(\beta) - \dot{\beta}^2bsin(\beta) = \ddot{c}sin(\gamma)
+    \end{cases}
+\end{equation}
+
+dalla quale è comodo ricavare e risolvere il sistema matriciale sfruttando i dati forniti dal problema e quelli ottenuti al punto precedente.
+
+\begin{equation}
+    \begin{bmatrix}
+        cos(\gamma) & bsin(\beta) \\
+        sin(\gamma) & -bcos(\beta)
+    \end{bmatrix}
+    \begin{bmatrix}
+        \ddot{c} \\
+        \ddot{\beta}
+    \end{bmatrix}
+    = \begin{bmatrix}
+        -\ddot{\alpha}asin(\alpha) - \dot{\alpha}^2acos(\alpha) - \dot{\beta}^2bcos(\beta) \\
+        \ddot{\alpha}acos(\alpha) - \dot{\alpha}^2asin(\alpha) - \dot{\beta}^2bsin(\beta)
+    \end{bmatrix}
+\end{equation}
+
+Conseguentemente, tramite script MATLAB, è possibile rappresentare in un grafico le accelerazioni del piede di biella $\ddot{c}$ e l'accelerazione angolare della biella $\ddot{\beta}$ in funzione della rotazione della manovella $\alpha$.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Accelerazione Redaelli.png}
+    \caption{Grafici delle accelerazioni}
+    \label{fig:5}
+\end{figure}
+
+\bigskip
+\bigskip
+\bigskip
+
+\subsection{Animazione del moto}
+Sempre tramite script MATLAB è possibile mostrare una breve animazione del comportamento del sistema. Sono di seguito mostrati alcuni snapshot dell'animazione.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{Snap1.jpg}
+    \caption{Istantanee dal sistema}
+    \label{fig:6}
+\end{figure}
+
+\section{Codice MATLAB utilizzato}
+Viene di seguito riportato lo script MATLAB utilizzato per le analisi cinematiche del problema. 
+
+\bigskip 
+
+Si ringrazia il Prof. Stefano Arrigoni per la base di codice fornita durante le esercitazioni del corso. Il codice è stato adattato al problema in questione ed ulteriormente sviluppato al fine di poter selezionare manualmente anche l'accelerazione angolare da fornire al sistema.
+
+\bigskip
+
+\begin{lstlisting}[basicstyle=\footnotesize]
+clc
+close all
+clear all
+
+%% Inserimento dati iniziali
+
+corretto = 1;
+while corretto == 1
+    a = input('Raggio manovella in [m]: ');
+    b = input('Lunghezza biella in [m]: ');
+
+    if a < b
+        corretto = 0;
+    else
+        disp('La manovella non puo essere piu lunga della biella.')
+    end
+end
+
+% Definizione della discretizzazione dell'analisi
+
+alfa_d = 0:0.1:36000;                                                       
+alfa = alfa_d * (pi / 180);                                               
+
+alfap = input('Assegna velocita angolare manovella [rad/s]: ');  
+alfapp = input('Assegna accelerazione angolare manovella [rad/s^2]: ');                                                                
+
+%% Rappresentazione della configurazione iniziale
+
+beta_a = asin(-(a * sin(alfa(451))) / b);
+c_a = a * cos(alfa(451)) + b * cos(beta_a);
+gamma = 0;
+OA = a * exp(1i * alfa(451));
+AB = b * exp(1i * beta_a);
+OB = c_a * exp(1i * gamma);
+figure()
+
+% Rappresentazione delle cerniere
+plot(0, 0, 'ko')
+xlabel('x [m]')
+ylabel('y [m]')
+title('Configurazione a alpha = 45')
+hold on
+
+% Posizioni di O, A e B
+O = 0;
+A = OA;
+B = OB;
+
+% Rappresentazione delle posizioni O, A e B
+plot(real(O), imag(O), 'ko')
+plot(real(A), imag(A), 'ko')
+plot(real(B), imag(B), 'ko')
+
+% Etichette
+offset = 0.05;
+text(real(O), imag(O) + offset, 'O', 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom')
+text(real(A), imag(A) + offset, 'A', 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom')
+text(real(B) + offset, imag(B), 'B', 'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom')
+
+% Rappresentazione delle aste
+plot([0 real(A)], [0 imag(A)], 'r-', 'LineWidth', 3)
+plot([real(A) real(A + AB)], [imag(A) imag(A + AB)], 'g-', 'LineWidth', 3)
+plot([0 real(B)], [0 imag(B)], 'b-', 'LineWidth', 3)
+
+% Estensione degli assi
+offset_extend = 0.1;
+xlim([min([0 real(O) real(A) real(A + AB) real(B)]), max([0 real(O) real(A) real(A + AB) real(B)]))
+ylim([min([0 imag(O) imag(A) imag(A + AB) imag(B)]), max([0 imag(O) imag(A) imag(A + AB) imag(B)]))
+
+axis equal
+grid on
+
+%% Analisi della posizione
+
+beta = asin(-(a * sin(alfa)) / b);
+c = a * cos(alfa) + b * cos(beta);
+
+%% Analisi della velocita
+
+for i = 1:length(alfa)
+    A = [1, b * sin(beta(i));
+         0, -b * cos(beta(i))];
+
+    B = [-alfap * a * sin(alfa(i));
+          alfap * a * cos(alfa(i))];
+
+    xp = inv(A) * B;
+
+    cp(i) = xp(1);
+    betap(i) = xp(2);
+end
+
+%% Analisi dell'accelerazione
+
+for i = 1:length(alfa)
+    A = [1, b * sin(beta(i));
+         0, -b * cos(beta(i))];
+
+    B = [-alfapp * a * sin(alfa(i)) - alfap ^ 2 * a * cos(alfa(i)) - betap(i) ^ 2 * b * cos(beta(i));
+          alfapp * a * cos(alfa(i)) - alfap ^ 2 * a * sin(alfa(i)) - betap(i) ^ 2 * b * sin(beta(i))];
+
+    xpp = inv(A) * B;
+
+    cpp(i) = xpp(1);
+    betapp(i) = xpp(2);
+end
+
+%% Visualizzazione risultati
+
+visualizza = 1;
+while visualizza == 1
+    k = menu('Visualizzazione risultati', 'Grafici posizione', ...
+             'Grafici velocita', 'Grafici accelerazione', ...
+             'Animazione del moto', 'Fine');
+
+    % Grafico posizione
+    if k == 1
+        figure(1)
+        subplot(211)
+        plot(alfa * (180 / pi), c)
+        xlabel('Rotazione manovella')
+        ylabel('Posizione piede di biella [m]')
+        ax = axis;
+        axis([0, 360, ax(3), ax(4)])
+        grid on
+
+        subplot(212)
+        plot(alfa * (180 / pi), beta * (180 / pi))
+        xlabel('Rotazione manovella')
+        ylabel('Rotazione biella [rad]')
+        ax = axis;
+        axis([0, 360, ax(3), ax(4)])
+        grid on
+
+    % Grafico velocita
+    elseif k == 2
+        figure(2)
+        subplot(211)
+        plot(alfa * (180 / pi), cp)
+        xlabel('Rotazione manovella')
+        ylabel('Velocita piede di biella [m/s]')
+        ax = axis;
+        axis([0, 360, ax(3), ax(4)])
+        grid on 
+
+        subplot(212)
+        plot(alfa * (180 / pi), betap)
+        xlabel('Rotazione manovella')
+        ylabel('Velocita angolare biella [rad/s]')
+        ax = axis;
+        axis([0, 360, ax(3), ax(4)])
+        grid on
+
+    % Grafico accelerazione
+    elseif k == 3
+        figure(3)
+        subplot(211)
+        plot(alfa * (180 / pi), cpp)
+        xlabel('Rotazione manovella')
+        ylabel('Accelerazione piede di biella [m/s^2]')
+        ax = axis;
+        axis([0, 360, ax(3), ax(4)])
+        grid on
+
+        subplot(212)
+        plot(alfa * (180 / pi), betapp)
+        xlabel('Rotazione manovella')
+        ylabel('Accelerazione angolare biella [rad/s^2]')
+        ax = axis;
+        axis([0, 360, ax(3), ax(4)])
+        grid on
+
+    % Animazione del moto
+    elseif k == 4
+        figure(4)
+        set(gcf, 'DoubleBuffer', 'on')
+
+        ngiri = 3;
+        nxframe = 2;
+        nframe = ngiri * 360 / nxframe;
+        
+        for i = 1:nframe
+            igrado = nxframe * i;
+            n = floor(igrado / 360);
+            igrado = igrado - 360 * n;
+
+            ic = find(alfa * 180 / pi >= igrado);
+
+            x_manov = a * cos(alfa(ic(1)));
+            y_manov = a * sin(alfa(ic(1)));
+
+            x_biell = c(ic(1));
+            y_biell = 0;
+
+            plot([0, x_manov], [0, y_manov], 'r', ...
+                 [x_manov, x_biell], [y_manov, y_biell], 'b', ...
+                 [0, x_manov, x_biell], [0, y_manov, y_biell], 'ok')
+                 
+            axis([-a - b, a + b, -a - b, a + b])
+            axis equal;
+            title(sprintf('Ciclo: %d', n + 1))
+            xlabel('[m]')
+            ylabel('[m]') 
+            xlim([-a - 0.1, a + b + 0.1])
+            ylim([-a - 0.1, a + 0.1])
+            grid on
+            drawnow
+        end
+    else
+        visualizza = 0;
+        close all
+    end
+end
+\end{lstlisting}
+
+\section{Conclusioni, riferimenti e licenza d'uso}
+Il report è disponibile al seguente link: 
+\hypersetup{urlcolor=blue}
+\urlstyle{same}
+\url{https://github.com/lucaredaelli/Report-Cinematica-Meccanica}
+
+\bigskip
+All'interno della repository è possibile reperire:
+
+\begin{itemize}
+    \item Lo script MATLAB utilizzato per l'analisi
+    \item Le immagini dei grafici (a dimensione reale)
+    \item L'animazione del manovellismo
+    \item Il file .pdf del report
+    \item Il file .tex del report
+\end{itemize}
+
+\subsection{Licenza}
+Copyright (c) 2023 Luca Redaelli
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this report and software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+\bigskip
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+\bigskip
+
+THE REPORT AND SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+\end{document}
